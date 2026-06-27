@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: quori-postgres
+    environment:
+      POSTGRES_DB: quori
+      POSTGRES_USER: quori
+      POSTGRES_PASSWORD: quori
+    ports:
+      - "5432:5432"
+    volumes:
+      - quori-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quori"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  quori-pgdata:

@@ -31,7 +31,7 @@ public class AuthorizationService {
         var user = appUserRepository.findByFirebaseUid(jwt.getSubject()).orElse(null);
         if (user == null) return false;
         return organizationRepository.findById(organizationId)
-                .map(org -> org.getOwnerEmail().equals(user.getEmail()))
+                .map(org -> org.getOwner().getId().equals(user.getId()))
                 .orElse(false);
     }
 
@@ -39,7 +39,7 @@ public class AuthorizationService {
         var user = appUserRepository.findByFirebaseUid(jwt.getSubject()).orElse(null);
         if (user == null) return false;
         return eventRepository.findById(eventId)
-                .map(event -> event.getOrganization().getOwnerEmail().equals(user.getEmail()))
+                .map(event -> event.getOrganization().getOwner().getId().equals(user.getId()))
                 .orElse(false);
     }
 
@@ -47,7 +47,7 @@ public class AuthorizationService {
         var user = appUserRepository.findByFirebaseUid(jwt.getSubject()).orElse(null);
         if (user == null) return false;
         return productRepository.findById(productId)
-                .map(product -> product.getEvent().getOrganization().getOwnerEmail().equals(user.getEmail()))
+                .map(product -> product.getEvent().getOrganization().getOwner().getId().equals(user.getId()))
                 .orElse(false);
     }
 }

@@ -67,7 +67,6 @@ class SecurityIntegrationTest {
 
     @Test
     void authenticatedUser_canAccessMe() throws Exception {
-        // Register
         mockMvc.perform(post("/api/v1/users/register")
                 .with(SecurityMockMvcRequestPostProcessors.jwt()
                         .jwt(jwt -> jwt.subject("firebase-uid-me").claim("email", "me@quori.app"))
@@ -77,7 +76,6 @@ class SecurityIntegrationTest {
                         {"displayName": "Me User", "role": "CUSTOMER"}
                         """));
 
-        // Access /me
         mockMvc.perform(get("/api/v1/users/me")
                         .with(jwtAs("firebase-uid-me", "me@quori.app")))
                 .andExpect(status().isOk())
@@ -86,7 +84,6 @@ class SecurityIntegrationTest {
 
     @Test
     void customerRole_cannotCreateOrganization() throws Exception {
-        // Register as CUSTOMER
         mockMvc.perform(post("/api/v1/users/register")
                 .with(SecurityMockMvcRequestPostProcessors.jwt()
                         .jwt(jwt -> jwt.subject("firebase-uid-customer").claim("email", "customer@quori.app"))
@@ -96,19 +93,17 @@ class SecurityIntegrationTest {
                         {"displayName": "Customer", "role": "CUSTOMER"}
                         """));
 
-        // Try to create org → 403
         mockMvc.perform(post("/api/v1/organizations")
                         .with(jwtAs("firebase-uid-customer", "customer@quori.app"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "Org", "ownerEmail": "customer@quori.app"}
+                                {"name": "Org"}
                                 """))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void organizerRole_canCreateOrganization() throws Exception {
-        // Register as ORGANIZER
         mockMvc.perform(post("/api/v1/users/register")
                 .with(SecurityMockMvcRequestPostProcessors.jwt()
                         .jwt(jwt -> jwt.subject("firebase-uid-organizer").claim("email", "organizer@quori.app"))
@@ -118,14 +113,14 @@ class SecurityIntegrationTest {
                         {"displayName": "Organizer", "role": "ORGANIZER"}
                         """));
 
-        // Create org → 201
         mockMvc.perform(post("/api/v1/organizations")
                         .with(jwtAs("firebase-uid-organizer", "organizer@quori.app"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name": "My Org", "ownerEmail": "organizer@quori.app"}
+                                {"name": "My Org"}
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("My Org"));
+                .andExpect(jsonPath("$.name").value("My Org"))
+                .andExpect(jsonPath("$.ownerDisplayName").value("Organizer"));
     }
 }

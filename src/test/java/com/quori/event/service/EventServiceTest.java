@@ -42,7 +42,6 @@ class EventServiceTest {
         var org = new Organization();
         org.setId(orgId);
         org.setName("Test Org");
-        org.setOwnerEmail("test@test.com");
 
         when(organizationService.findOrThrow(orgId)).thenReturn(org);
         when(repository.save(any(Event.class))).thenAnswer(invocation -> {

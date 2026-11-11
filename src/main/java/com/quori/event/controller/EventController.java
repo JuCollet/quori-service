@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class EventController {
 
     @PostMapping("/organizations/{orgId}/events")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ORGANIZER') and @authz.isOrganizationOwner(principal, #orgId)")
     @Operation(summary = "Create an event for an organization")
     public EventResponse create(@PathVariable UUID orgId,
                                 @Valid @RequestBody CreateEventRequest request) {
@@ -52,6 +54,7 @@ public class EventController {
     }
 
     @PatchMapping("/events/{id}/status")
+    @PreAuthorize("hasRole('ORGANIZER') and @authz.isEventOrganizationOwner(principal, #id)")
     @Operation(summary = "Update event status")
     public EventResponse updateStatus(@PathVariable UUID id,
                                       @Valid @RequestBody UpdateEventStatusRequest request) {

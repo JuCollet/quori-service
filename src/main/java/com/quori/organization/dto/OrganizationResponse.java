@@ -8,7 +8,8 @@ import java.util.UUID;
 public record OrganizationResponse(
         UUID id,
         String name,
-        String ownerEmail,
+        UUID ownerId,
+        String ownerDisplayName,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -16,7 +17,8 @@ public record OrganizationResponse(
         return new OrganizationResponse(
                 entity.getId(),
                 entity.getName(),
-                entity.getOwnerEmail(),
+                entity.getOwner().getId(),
+                entity.getOwner().getDisplayName(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +35,7 @@ public class ProductController {
 
     @PostMapping("/events/{eventId}/products")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ORGANIZER') and @authz.isEventOrganizationOwner(principal, #eventId)")
     @Operation(summary = "Create a product for an event")
     public ProductResponse create(@PathVariable UUID eventId,
                                   @Valid @RequestBody CreateProductRequest request) {
@@ -47,6 +49,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id}")
+    @PreAuthorize("hasRole('ORGANIZER') and @authz.isProductOrganizationOwner(principal, #id)")
     @Operation(summary = "Update a product")
     public ProductResponse update(@PathVariable UUID id,
                                   @Valid @RequestBody UpdateProductRequest request) {
@@ -55,6 +58,7 @@ public class ProductController {
 
     @DeleteMapping("/products/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ORGANIZER') and @authz.isProductOrganizationOwner(principal, #id)")
     @Operation(summary = "Soft-delete a product")
     public void delete(@PathVariable UUID id) {
         service.delete(id);
